@@ -1,0 +1,20 @@
+书里面的指令{sudo git clone https://github.com/longld/peda.git ~/peda
+		    echo "source ~/peda/peda.py">>~/.gdbinit}
+peda的基本方法set disassembly-flavor intel 
+			break start(main)
+			run
+例子
+nasm -felf32 Welcome_to_CTFshow.asm6 -o temp.o
+
+ld -m elf_i386 Welcome_to_CTFshow.asm5 -o hello
+
+26题涉及命令（cat /proc/sys/kernal/randomize_va_space）查看安全保护机制ASLR（address space layout randomization）
+栈：：：主要有mmap，orw技术，沙盒过滤(使用 seccomp-tools dump ./pwn 查看一下哪些函数可以使用)，ret2resolve(_dl_runtime_resolve)，sigreturn(SROP)，pwn121:try_catch(rbp回退机制)，pwn117(canary检测失败时会调用stack_chk_fail函数，输出一段报错，报错会输出文件名，覆盖文件名指针，从而实现任意读，也就是覆盖变量__libc_argv[0])
+
+
+
+
+堆：：：unlink  (断开的是伪造的fake_chunk，当free一个chunk1时，ptmalloc判断前一个和后一个物理相邻的块是否在使用(根据chunk1的size字段的最后一位判断))
+###具体需要绕过两个if判断，源码在https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/implementation/basic/
+方法一：可以通过溢出更改上一个块的用户数据为一个完整的块，并且覆盖准备free的chunk1的pre_size和size字段，chunk1的pre_size=fake_chunk.size，chunk1的size的最后一位的pre_inuse为0
+方法二：通过UAF修改已经在arena内的fake_chunk的fd和bk字段，这样第一个if就无需绕过了，因为fake_chunk已经在双链表里了(fake_chunk的下一个物理相邻的块的pre_size字段的值已经是物理相邻的块fake_chunk的大小了),主要构造fake_chunk的fd和bk。
