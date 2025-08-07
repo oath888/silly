@@ -217,6 +217,8 @@ print('dict1 is deleted \'del dict1\'')
 
 # This is string manipulation
 print("This is string manipulation"+'*'*50)
+s1='abcdefghijklmnopqrstuvwxyz'
+print(''.join(str(ord(i)) for i in s1))
 a,b,c=2,0,0
 print(f'{a=}, {b=}, {c=}')
 a='%c' % 97
@@ -226,7 +228,7 @@ print(bytes.fromhex('68 65 6c6c6f20776f726c64').decode('utf-8')) # 'hello world'
 print('啊'.encode(),'a'.encode(),sep='\t')
 print(bin(11), oct(11), hex(11),int('11',base=8), sep='\t')
 print(f'Testing BOM {''.encode('utf-16')}')
-s2='a'
+s2='数字是: {:o}'
 print(s2.zfill(5))
 print(s2.format(12))
 s1=b'ab'
@@ -297,3 +299,85 @@ print(f's1 rfind "l": {s1.rfind(b"l")}')
 print(f's1 replace "l" with "L": {s1.replace(b"l", b"L")}')
 print(f's1 split: {s1.split()}')
 
+# This is function annotation
+print("This is function annotation"+'*'*50)
+def add_annotation(x:int =10, y:int =20) -> int:
+    return x + y
+add=add_annotation(1,2)
+print(f'function add_annotation with annotation: {add=}, {add_annotation.__annotations__=}')
+# This is ord and chr
+s1='abcdefghijklmnopqrstuvwxyz'
+print(''.join(str(ord(_)) for _ in s1))
+
+# This is map function with function annotation
+print("This is map function with function annotation"+'*'*50)
+def square(x: int) -> int:
+    """Returns the square of a number."""
+    return x * x
+x=list(map(square, range(10)))
+print(f'square function with annotation: {x=}, {square.__annotations__=}')
+
+# This is filter function with function annotation
+print("This is filter function with function annotation")
+def is_even(x: int) -> bool:
+    """Returns True if the number is even, False otherwise."""
+    return x % 2 == 0
+x=list(filter(is_even, range(10)))
+print(f'is_even function with annotation: {x=}, {is_even.__annotations__=}')
+
+# This is lambda function
+print("This is lambda function"+'*'*50)
+lambda_square = lambda x: x * x
+print(""f'lambda_square function: {lambda_square(5)=}, {lambda_square.__annotations__=}')
+
+# This is embedded function
+print("This is embedded function"+'*'*50)
+def outer_function(x: int) -> int:
+    """Outer function that takes an integer and returns a function."""
+    def inner_function(y: int) -> int:
+        """Inner function that takes an integer and returns the sum of x and y."""
+        return x + y
+    return inner_function
+inner = outer_function(10)
+print(f'outer_function with annotation: {inner(5)=}, {outer_function.__annotations__=}, {inner.__annotations__=}')
+
+# This is generator function
+print("This is generator function"+'*'*50)
+def generator_function(n: any) -> any:
+    """Generator function that yields squares of numbers from 0 to n."""
+    for i in range(n):
+        yield i * i
+gen = generator_function(5)
+print(f'generator_function with annotation: {list(gen)=}, {generator_function.__annotations__=}')
+
+# This is decorator function
+print("This is decorator function"+'*'*50)
+def decorator_function(func: callable) -> callable:
+    """Decorator function that modifies the behavior of the input function."""
+    def wrapper(*args, **kwargs):
+        print("Before calling the function")
+        result = func(*args, **kwargs)
+        print("After calling the function")
+        return result
+    return wrapper
+@decorator_function
+def decorated_function(x: int, y: int) -> int:
+    """Function that adds two numbers."""
+    return x + y
+print(f'decorated_function with annotation: {decorated_function(5, 10)=}, {decorated_function.__annotations__=}')
+
+# This is decorator with arguments
+print("This is decorator with arguments"+'*'*50)
+def decorator_with_args(arg1: str, arg2: str) -> callable:
+    """Decorator that takes arguments."""
+    def decorator(func: callable) -> callable:
+        def wrapper(*args, **kwargs):
+            print(f"Decorator arguments: {arg1}, {arg2}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+@decorator_with_args("Hello", "World")
+def decorated_function_with_args(x: int, y: int) -> int:
+    """Function that adds two numbers."""
+    return x + y
+print(f'decorated_function_with_args with annotation: {decorated_function_with_args(5, 10)=}, {decorated_function_with_args.__annotations__=}')
